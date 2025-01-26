@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1737858467346",
+    "title": "Producto Nuevo",
+    "description": "Descripción del producto",
+    "code": "ABC123",
+    "price": 100,
+    "status": true,
+    "stock": 50,
+    "category": "Electrónica",
+    "thumbnails": [
+      "ruta_imagen_1",
+      "ruta_imagen_2"
+    ]
+  }
+]
