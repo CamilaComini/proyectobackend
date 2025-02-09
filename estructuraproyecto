@@ -1,9 +1,9 @@
-mi-servidor/
-├── routes/
-│   ├── products.js
-│   └── carts.js
-├── data/
-│   ├── products.json
-│   └── carts.json
-├── server.js
-├── package.json
+/mi-proyecto
+│── /src
+│   │── /routes
+│   │── /views  <--Aquí van los archivos de Handlebars
+│   │   │── index.handlebars
+│   │   │── realTimeProducts.handlebars
+│   │── server.js
+│── package.json
+│── products.json  <--Archivo donde se guardan los productos
