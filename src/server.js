@@ -1,12 +1,15 @@
 const express = require('express');
+const Product = require('./models/product');
 const path = require('path');
 const http = require('http');
 const socketIo = require('socket.io');
 const { engine } = require('express-handlebars');
+const mongoose = require('./config/database'); 
 const productsRouter = require('./routes/products.router'); // Ruta de productos
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server); // Inicializar socket.io
+const errorMiddleware = require('./middleware/errorMiddleware');
 
 // Configuración de Handlebars
 app.set('views', path.join(__dirname, 'views'));
@@ -14,6 +17,7 @@ app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 
 // Middlewares
+app.use(errorMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -33,14 +37,8 @@ app.get('/realtimeproducts', (req, res) => {
     res.render('realTimeProducts');
 });
 
-// Definir la lista de productos
-let productos = [
-    { id: '1', title: 'Consola Gamer Mi Stick Tv', price: 60.000 },
-    { id: '2', title: 'Celular Iphone 13', price: 600.000 },
-    { id: '3', title: 'Auriculares Inalambricos D35', price: 27.000 }
-];
-
 // Iniciar servidor
+require('./config/database'); // Importamos la conexión a la base de datos
 const PORT = 8080;
 server.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
@@ -51,17 +49,45 @@ io.on('connection', (socket) => {
     console.log('Cliente conectado');
 
     // Emitir productos al cliente
-    socket.emit('productos', productos);
-
-    // Recibir productos creados o eliminados
-    socket.on('nuevoProducto', (producto) => {
-        productos.push(producto);
-        io.emit('productos', productos);
+    Product.find().then((productos) => {
+        socket.emit('productos', productos);
     });
 
-    socket.on('eliminarProducto', (id) => {
-        productos = productos.filter(producto => producto.id !== id);
-        io.emit('productos', productos);
+    // Recibir productos creados o eliminados
+    socket.on('nuevoProducto', async (producto) => {
+        try {
+            if (!producto || !producto.title || !producto.price || isNaN(producto.price) || producto.price <= 0) {
+                socket.emit('error', 'Producto inválido. Asegúrate de enviar un título y un precio válido.');
+                return;
+            }
+
+            // Guardar en la base de datos
+            const newProduct = new Product(producto);
+            await newProduct.save();
+
+            // Emitir los productos actualizados
+            const productos = await Product.find();
+            io.emit('productos', productos);
+        } catch (err) {
+            socket.emit('error', 'Error al agregar el producto.');
+            console.error(err);
+        }
+    });
+
+    socket.on('eliminarProducto', async (id) => {
+        try {
+            const producto = await Product.findByIdAndDelete(id);
+            if (!producto) {
+                socket.emit('error', 'Producto no encontrado.');
+                return;
+            }
+
+            const productos = await Product.find();
+            io.emit('productos', productos);
+        } catch (err) {
+            socket.emit('error', 'Error al eliminar el producto.');
+            console.error(err);
+        }
     });
 
     socket.on('disconnect', () => {

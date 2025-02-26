@@ -1,9 +1,24 @@
 /mi-proyecto
+│── /node_modules
 │── /src
+│   │── /controllers
+│   │   ├── productsController.js
+│   │── /data
+│   │   ├── carts.json
+│   │   ├── products.json
+│   │── /models
+│   │   ├── carts.js
+│   │   ├── products.js
 │   │── /routes
-│   │── /views  <--Aquí van los archivos de Handlebars
+│   │   ├── carts.router.js
+│   │   ├── products.router.js
+│   │── /views  
+│   │   │── /layouts
+│   │   │    │── main.handlebars
 │   │   │── index.handlebars
 │   │   │── realTimeProducts.handlebars
 │   │── server.js
+│── estructuraproyecto
+│── package-lock.json
 │── package.json
-│── products.json  <--Archivo donde se guardan los productos
+│── products.json  

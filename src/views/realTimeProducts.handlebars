@@ -35,11 +35,16 @@
             socket.emit("nuevoProducto", { id: Date.now().toString(), title, price });
             document.getElementById("title").value = "";
             document.getElementById("price").value = "";
+            alert("Producto agregado exitosamente.");
         }
 
-        // Eliminar producto
+        // Eliminar producto con confirmación
         function eliminarProducto(id) {
-            socket.emit("eliminarProducto", id);
+            const confirmDelete = confirm("¿Estás seguro de que quieres eliminar este producto?");
+            if (confirmDelete) {
+                socket.emit("eliminarProducto", id);
+                alert("Producto eliminado.");
+            }
         }
     </script>
 </head>

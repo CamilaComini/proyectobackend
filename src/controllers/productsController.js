@@ -1,81 +1,159 @@
-const fs = require('fs');
-const path = require('path');
-const productsFilePath = path.join(__dirname, '../data/products.json');
+const Product = require('../models/product'); // Importar el modelo de productos
+const Joi = require('joi');
 
-const getAllProducts = (req, res) => {
-  const limit = parseInt(req.query.limit);
-  const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
-  if (limit) {
-    return res.json(products.slice(0, limit));
+// Esquema de validación para un producto
+const productSchema = Joi.object({
+  title: Joi.string().required(),
+  description: Joi.string().required(),
+  code: Joi.string().required(),
+  price: Joi.number().positive().required(),
+  stock: Joi.number().integer().min(0).required(),
+  category: Joi.string().required(),
+  thumbnails: Joi.array().items(Joi.string().uri()),
+  status: Joi.boolean()
+});
+
+const getProducts = async (req, res) => {
+  try {
+    const { category, available, sortByPrice } = req.query;
+    
+    let query = {};
+    
+    // Filtrar por categoría
+    if (category) {
+      query.category = category;
+    }
+
+    // Filtrar por disponibilidad
+    if (available) {
+      query.available = available === 'true';  // Esto asume que 'available' es un booleano
+    }
+
+    // Ordenar por precio
+    let sort = {};
+    if (sortByPrice) {
+      sort.price = sortByPrice === 'asc' ? 1 : -1;  // Ascendente o descendente
+    }
+
+    const products = await Product.find(query).sort(sort);
+    
+    res.json(products);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al obtener productos" });
   }
-  res.json(products);
 };
 
-const getProductById = (req, res) => {
-  const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
-  const product = products.find(p => p.id === req.params.pid);
-  if (!product) {
-    return res.status(404).json({ error: 'Producto no encontrado' });
+// Obtener todos los productos con paginación, filtrado y ordenamiento
+const getAllProducts = async (req, res, next) => {
+  try {
+    const { limit = 10, page = 1, sort, category, availability } = req.query;
+
+    // Convertir valores a numéricos si es necesario
+    const options = {
+      limit: parseInt(limit),
+      page: parseInt(page),
+      sort: sort === 'asc' ? { price: 1 } : sort === 'desc' ? { price: -1 } : undefined
+    };
+
+    // Filtrar por categoría y disponibilidad
+    let filter = {};
+    if (category) {
+      filter.category = { $regex: category, $options: 'i' };
+    }
+    if (availability) {
+      filter.status = availability === 'true';
+    }
+
+    // Obtener productos con paginación y filtros
+    const result = await Product.paginate(filter, options);
+
+    res.json({
+      status: 'success',
+      payload: result.docs,
+      totalPages: result.totalPages,
+      prevPage: result.prevPage,
+      nextPage: result.nextPage,
+      page: result.page,
+      hasPrevPage: result.hasPrevPage,
+      hasNextPage: result.hasNextPage,
+      prevLink: result.hasPrevPage ? `/api/products?page=${result.prevPage}` : null,
+      nextLink: result.hasNextPage ? `/api/products?page=${result.nextPage}` : null
+    });
+  } catch (error) {
+    next(error);
   }
-  res.json(product);
 };
 
-const createProduct = (req, res) => {
-  const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
-  const { title, description, code, price, stock, category, thumbnails } = req.body;
-
-  if (!title || !description || !code || !price || !stock || !category) {
-    return res.status(400).json({ error: 'Todos los campos son obligatorios excepto thumbnails' });
+// Obtener un producto por ID
+const getProductById = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.pid);
+    if (!product) {
+      return res.status(404).json({ status: 'error', error: 'Producto no encontrado' });
+    }
+    res.json({ status: 'success', payload: product });
+  } catch (error) {
+    next(error);
   }
-
-  const newProduct = {
-    id: `${Date.now()}`,
-    title,
-    description,
-    code,
-    price,
-    status: true,
-    stock,
-    category,
-    thumbnails: thumbnails || []
-  };
-
-  products.push(newProduct);
-  fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
-  res.status(201).json(newProduct);
 };
 
-const updateProduct = (req, res) => {
-  const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
-  const productIndex = products.findIndex(p => p.id === req.params.pid);
+// Crear un nuevo producto
+const createProduct = async (req, res, next) => {
+  try {
+    // Validar los datos entrantes
+    const { error } = productSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ status: 'error', error: error.details[0].message });
+    }
 
-  if (productIndex === -1) {
-    return res.status(404).json({ error: 'Producto no encontrado' });
+    const newProduct = new Product(req.body);
+    await newProduct.save();
+    res.status(201).json({ status: 'success', payload: newProduct });
+  } catch (error) {
+    next(error);
   }
-
-  const updates = req.body;
-  if (updates.id) {
-    return res.status(400).json({ error: 'No se puede actualizar el ID del producto' });
-  }
-
-  products[productIndex] = { ...products[productIndex], ...updates };
-  fs.writeFileSync(productsFilePath, JSON.stringify(products, null, 2));
-  res.json(products[productIndex]);
 };
 
-const deleteProduct = (req, res) => {
-  const products = JSON.parse(fs.readFileSync(productsFilePath, 'utf-8'));
-  const newProducts = products.filter(p => p.id !== req.params.pid);
+// Actualizar un producto por ID
+const updateProduct = async (req, res, next) => {
+  try {
+    const updates = req.body;
+    if (updates.id) {
+      return res.status(400).json({ status: 'error', error: 'No se puede actualizar el ID del producto' });
+    }
 
-  if (products.length === newProducts.length) {
-    return res.status(404).json({ error: 'Producto no encontrado' });
+    // Validar los datos entrantes
+    const { error } = productSchema.validate(updates);
+    if (error) {
+      return res.status(400).json({ status: 'error', error: error.details[0].message });
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.pid, updates, { new: true });
+    if (!updatedProduct) {
+      return res.status(404).json({ status: 'error', error: 'Producto no encontrado' });
+    }
+    res.json({ status: 'success', payload: updatedProduct });
+  } catch (error) {
+    next(error);
   }
+};
 
-  fs.writeFileSync(productsFilePath, JSON.stringify(newProducts, null, 2));
-  res.json({ message: 'Producto eliminado con éxito' });
+// Eliminar un producto por ID
+const deleteProduct = async (req, res, next) => {
+  try {
+    const deletedProduct = await Product.findByIdAndDelete(req.params.pid);
+    if (!deletedProduct) {
+      return res.status(404).json({ status: 'error', error: 'Producto no encontrado' });
+    }
+    res.json({ status: 'success', message: 'Producto eliminado con éxito' });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
+  getProducts,
   getAllProducts,
   getProductById,
   createProduct,
