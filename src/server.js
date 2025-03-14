@@ -10,6 +10,11 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server); // Inicializar socket.io
 const errorMiddleware = require('./middleware/errorMiddleware');
+const passport = require('./config/passport');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+const User = require('./models/user');
 
 // Configuración de Handlebars
 app.set('views', path.join(__dirname, 'views'));
@@ -20,6 +25,9 @@ app.set('view engine', 'handlebars');
 app.use(errorMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use(cookieParser()); 
+app.use(passport.initialize());
 
 // Archivos estáticos (si tienes CSS, JS, etc. en una carpeta public)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -35,13 +43,6 @@ app.get('/', (req, res) => {
 // Ruta para la vista en tiempo real
 app.get('/realtimeproducts', (req, res) => {
     res.render('realTimeProducts');
-});
-
-// Iniciar servidor
-require('./config/database'); // Importamos la conexión a la base de datos
-const PORT = 8080;
-server.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
 
 // WebSocket para actualizar productos en tiempo real
@@ -93,4 +94,39 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('Cliente desconectado');
     });
+});
+
+// Importar las rutas
+const authRoutes = require('./routes/authRoutes');
+const sessionRoutes = require('./routes/sessionsRoutes');
+
+app.use('/api/sessions', sessionRoutes);
+app.use('/api/auth', authRoutes);
+
+
+// Ruta para obtener el usuario actual (basado en el JWT)
+app.get('/api/sessions/current', passport.authenticate('current', { session: false }), (req, res) => {
+    res.json(req.user); // Devuelve los datos del usuario
+  });
+  
+  // Ruta de login (login con JWT)
+  app.post('/api/sessions/login', (req, res, next) => {
+    passport.authenticate('local', { session: false }, (err, user, info) => {
+      if (err || !user) {
+        return res.status(400).json({ message: info.message || 'Algo salió mal' });
+      }
+  
+      // Generar JWT
+      const payload = { id: user._id };
+      const token = jwt.sign(payload, 'clave_secreta', { expiresIn: '1h' });
+  
+      return res.json({ user, token });
+    })(req, res, next);
+  });
+  
+// Iniciar servidor
+require('./config/database'); // Importamos la conexión a la base de datos
+const PORT = 8080;
+server.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
