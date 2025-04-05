@@ -1,5 +1,5 @@
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv');
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
@@ -10,9 +10,9 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export const sendPurchaseEmail = async (to, ticket) => {
+const sendPurchaseEmail = async (to, ticket) => {
   const mailOptions = {
-    from: '"Punto LAN 🛒" <' + process.env.MAIL_USER + '>',
+    from: `"Punto LAN 🛒" <${process.env.MAIL_USER}>`,
     to,
     subject: '🎉 ¡Gracias por tu compra en Punto LAN!',
     html: `
@@ -33,4 +33,8 @@ export const sendPurchaseEmail = async (to, ticket) => {
   } catch (err) {
     console.error('❌ Error al enviar el correo:', err);
   }
+};
+
+module.exports = {
+  sendPurchaseEmail
 };

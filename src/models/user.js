@@ -1,4 +1,4 @@
-const mongoose = require('../config/database.js'); // Usar la conexión centralizada
+const mongoose = require('../config/database.js'); // solo para conectarte
 const bcrypt = require('bcryptjs');
 
 // Crear el esquema del usuario
@@ -47,7 +47,6 @@ userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-// Evitar sobreescritura si ya está definido
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 module.exports = User;

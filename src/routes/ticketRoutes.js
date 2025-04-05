@@ -1,8 +1,8 @@
-import { Router } from 'express';
-import { createTicket } from '../services/ticketService.js';
-import { jwtMiddleware } from '../middlewares/jwtMiddleware.js';
+const express = require('express');
+const { createTicket } = require('../services/ticketService');
+const { jwtMiddleware } = require('../middleware/jwtMiddleware');
 
-const router = Router();
+const router = express.Router();
 
 router.post('/', jwtMiddleware, async (req, res) => {
   try {
@@ -13,4 +13,4 @@ router.post('/', jwtMiddleware, async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

@@ -1,12 +1,12 @@
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import passport from 'passport';
-import './config/passport.js';
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+require('./config/passport.js');
 
-import authRoutes from './routes/authRoutes.js';
-import productRoutes from './routes/productRoutes.js';
-import cartRoutes from './routes/cartRoutes.js';
-import ticketRoutes from './routes/ticketRoutes.js';
+const authRoutes = require('./routes/authRoutes.js');
+const productRoutes = require('./routes/productRoutes.js');
+const cartRoutes = require('./routes/cartRoutes.js');
+const ticketRoutes = require('./routes/ticketRoutes.js');
 
 const app = express();
 
@@ -20,4 +20,4 @@ app.use('/api/products', productRoutes);
 app.use('/api/carts', cartRoutes);
 app.use('/api/tickets', ticketRoutes);
 
-export default app;
+module.exports = app;

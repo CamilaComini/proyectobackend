@@ -1,9 +1,17 @@
-import ProductRepository from '../repositories/productRepository.js';
+const ProductRepository = require('../repositories/productRepository');
 
 const productRepo = new ProductRepository();
 
-export const getAllProducts = async () => productRepo.getAllProducts();
-export const getProductById = async (id) => productRepo.getProductById(id);
-export const createProduct = async (data) => productRepo.createProduct(data);
-export const updateProduct = async (id, data) => productRepo.updateProduct(id, data);
-export const deleteProduct = async (id) => productRepo.deleteProduct(id);
+const getAllProducts = async () => productRepo.getAllProducts();
+const getProductById = async (id) => productRepo.getProductById(id);
+const createProduct = async (data) => productRepo.createProduct(data);
+const updateProduct = async (id, data) => productRepo.updateProduct(id, data);
+const deleteProduct = async (id) => productRepo.deleteProduct(id);
+
+module.exports = {
+  getAllProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct
+};

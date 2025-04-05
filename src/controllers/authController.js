@@ -1,6 +1,6 @@
-import passport from 'passport';
-import jwt from 'jsonwebtoken';
-import User from '../models/user.js';
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 // Función para generar un JWT
 const generateToken = (user) => {
@@ -10,7 +10,7 @@ const generateToken = (user) => {
 };
 
 // Login de usuario
-export const login = async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
@@ -41,7 +41,7 @@ export const login = async (req, res) => {
 };
 
 // Obtener usuario actual desde token
-export const currentUser = (req, res, next) => {
+const currentUser = (req, res, next) => {
   passport.authenticate('current', { session: false }, (error, user, info) => {
     if (error) {
       return res.status(500).json({ message: 'Error en el servidor' });
@@ -55,4 +55,9 @@ export const currentUser = (req, res, next) => {
       role: user.role,
     });
   })(req, res, next);
+};
+
+module.exports = {
+  login,
+  currentUser,
 };

@@ -6,8 +6,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const { engine } = require('express-handlebars');
 const passport = require('./config/passport');
-const mongooseConnect = require('./config/database');
-const errorMiddleware = require('./middlewares/errorMiddleware');
+const mongoose = require('./config/database');
+const errorMiddleware = require('./middleware/errorMiddleware');
 const jwt = require('./utils/jwt');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -20,9 +20,6 @@ require('dotenv').config();
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-
-// Conexión a la base de datos
-mongooseConnect();
 
 // Configuración de Handlebars
 app.set('views', path.join(__dirname, 'views'));
@@ -85,7 +82,7 @@ io.on('connection', async (socket) => {
 });
 
 // Arrancar el servidor
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });

@@ -1,6 +1,6 @@
-import CartModel from '../models/cart.js';
+const CartModel = require('../models/cart');
 
-export default class MongoCartDao {
+class MongoCartDao {
   async getById(id) {
     return CartModel.findById(id).populate('items.product');
   }
@@ -17,12 +17,16 @@ export default class MongoCartDao {
   }
 
   async removeItem(cartId, productId) {
-    return CartModel.findByIdAndUpdate(cartId, {
-      $pull: { items: { product: productId } }
-    }, { new: true });
+    return CartModel.findByIdAndUpdate(
+      cartId,
+      { $pull: { items: { product: productId } } },
+      { new: true }
+    );
   }
 
   async clear(cartId) {
     return CartModel.findByIdAndUpdate(cartId, { items: [] }, { new: true });
   }
 }
+
+module.exports = MongoCartDao;

@@ -1,7 +1,17 @@
-import UserModel from '../models/user.js';
+const UserModel = require('../models/user');
 
-export default class MongoUserDao {
-  create = (data) => UserModel.create(data);
-  getByEmail = (email) => UserModel.findOne({ email });
-  getById = (id) => UserModel.findById(id);
+class MongoUserDao {
+  create(data) {
+    return UserModel.create(data);
+  }
+
+  getByEmail(email) {
+    return UserModel.findOne({ email });
+  }
+
+  getById(id) {
+    return UserModel.findById(id);
+  }
 }
+
+module.exports = MongoUserDao;

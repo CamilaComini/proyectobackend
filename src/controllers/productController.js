@@ -1,6 +1,6 @@
-import Joi from 'joi';
-import * as productService from '../services/productService.js';
-import ProductDTO from '../dto/ProductDTO.js';
+const Joi = require('joi');
+const productService = require('../services/productService');
+const ProductDTO = require('../dto/ProductDTO');
 
 // Validación con Joi
 const productSchema = Joi.object({
@@ -14,7 +14,7 @@ const productSchema = Joi.object({
   status: Joi.boolean()
 });
 
-export const getAllProducts = async (req, res, next) => {
+const getAllProducts = async (req, res, next) => {
   try {
     const { limit = 10, page = 1, sort, category, availability } = req.query;
 
@@ -47,7 +47,7 @@ export const getAllProducts = async (req, res, next) => {
   }
 };
 
-export const getProductById = async (req, res, next) => {
+const getProductById = async (req, res, next) => {
   try {
     const product = await productService.getProductById(req.params.pid);
     if (!product) return res.status(404).json({ status: 'error', error: 'Producto no encontrado' });
@@ -57,7 +57,7 @@ export const getProductById = async (req, res, next) => {
   }
 };
 
-export const createProduct = async (req, res, next) => {
+const createProduct = async (req, res, next) => {
   try {
     const { error } = productSchema.validate(req.body);
     if (error) return res.status(400).json({ status: 'error', error: error.details[0].message });
@@ -74,7 +74,7 @@ export const createProduct = async (req, res, next) => {
   }
 };
 
-export const updateProduct = async (req, res, next) => {
+const updateProduct = async (req, res, next) => {
   try {
     if (req.body.id) return res.status(400).json({ status: 'error', error: 'No se puede modificar el ID' });
 
@@ -90,7 +90,7 @@ export const updateProduct = async (req, res, next) => {
   }
 };
 
-export const deleteProduct = async (req, res, next) => {
+const deleteProduct = async (req, res, next) => {
   try {
     const product = await productService.getProductById(req.params.pid);
     if (!product) return res.status(404).json({ status: 'error', error: 'Producto no encontrado' });
@@ -104,4 +104,12 @@ export const deleteProduct = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+module.exports = {
+  getAllProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct
 };

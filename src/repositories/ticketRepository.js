@@ -1,9 +1,9 @@
-import MongoTicketDao from '../dao/MongoTicketDao.js';
-import TicketDTO from '../dto/TicketDTO.js';
+const MongoTicketDao = require('../dao/MongoTicketDao');
+const TicketDTO = require('../dto/TicketDTO');
 
 const dao = new MongoTicketDao();
 
-export default class TicketRepository {
+class TicketRepository {
   create = async (data) => {
     if (!(data instanceof TicketDTO)) {
       throw new Error('Los datos del ticket deben ser una instancia de TicketDTO');
@@ -15,3 +15,5 @@ export default class TicketRepository {
     return await dao.getById(id);
   };
 }
+
+module.exports = TicketRepository;

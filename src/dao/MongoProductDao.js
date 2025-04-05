@@ -1,7 +1,17 @@
-import ProductModel from '../models/product.js';
+const ProductModel = require('../models/product');
 
-export default class MongoProductDao {
-  getById = (id) => ProductModel.findById(id);
-  getAll = () => ProductModel.find();
-  create = (data) => ProductModel.create(data);
+class MongoProductDao {
+  getById(id) {
+    return ProductModel.findById(id);
+  }
+
+  getAll() {
+    return ProductModel.find();
+  }
+
+  create(data) {
+    return ProductModel.create(data);
+  }
 }
+
+module.exports = MongoProductDao;

@@ -1,8 +1,8 @@
-import { Router } from 'express';
-import * as AuthService from '../services/authService.js';
-import { login, currentUser } from '../controllers/authController.js';
+const express = require('express');
+const AuthService = require('../services/authService');
+const { login, currentUser } = require('../controllers/authController');
 
-const router = Router();
+const router = express.Router();
 
 // Registro de usuario
 router.post('/register', async (req, res) => {
@@ -18,4 +18,4 @@ router.post('/register', async (req, res) => {
 router.post('/login', login);
 router.get('/current', currentUser); // Ruta protegida con JWT y Passport
 
-export default router;
+module.exports = router;

@@ -1,6 +1,13 @@
-import TicketModel from '../models/ticket.js';
+const TicketModel = require('../models/ticket');
 
-export default class MongoTicketDao {
-  create = (ticketData) => TicketModel.create(ticketData);
-  getById = (id) => TicketModel.findById(id);
+class MongoTicketDao {
+  create(ticketData) {
+    return TicketModel.create(ticketData);
+  }
+
+  getById(id) {
+    return TicketModel.findById(id);
+  }
 }
+
+module.exports = MongoTicketDao;

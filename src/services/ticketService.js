@@ -1,14 +1,14 @@
-import TicketRepository from '../repositories/ticketRepository.js';
-import CartRepository from '../repositories/cartRepository.js';
-import ProductRepository from '../repositories/productRepository.js';
-import { v4 as uuidv4 } from 'uuid';
-import { sendPurchaseEmail } from '../utils/mailer.js';
+const TicketRepository = require('../repositories/ticketRepository');
+const CartRepository = require('../repositories/cartRepository');
+const ProductRepository = require('../repositories/productRepository');
+const { v4: uuidv4 } = require('uuid');
+const { sendPurchaseEmail } = require('../utils/mailer');
 
 const ticketRepository = new TicketRepository();
 const cartRepository = new CartRepository();
 const productRepository = new ProductRepository();
 
-export const createTicket = async (cartId, user) => {
+const createTicket = async (cartId, user) => {
   const cart = await cartRepository.getById(cartId);
   if (!cart || cart.items.length === 0) throw new Error('El carrito está vacío');
 
@@ -21,7 +21,6 @@ export const createTicket = async (cartId, user) => {
     if (!product) continue;
 
     if (product.stock >= item.quantity) {
-      // restar stock
       await productRepository.update(product._id, {
         stock: product.stock - item.quantity,
       });
@@ -66,4 +65,8 @@ export const createTicket = async (cartId, user) => {
     ticket,
     noProcesados: productosNoProcesados.map((p) => p.productId),
   };
+};
+
+module.exports = {
+  createTicket
 };

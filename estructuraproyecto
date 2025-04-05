@@ -40,7 +40,6 @@
 │   │   ├── cartRouter.js
 │   │   ├── authRoutes.js      
 │   │   ├── productRoutes.js  
-│   │   ├── sessionRoutes.js 
 │   │   └── ticketRoutes.js     
 │   ├── /services
 │   │   ├── authService.js     

@@ -1,16 +1,16 @@
-import { Router } from 'express';
-import * as controller from '../controllers/productController.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
+const express = require('express');
+const controller = require('../controllers/productController');
+const { authenticate, authorizeAdmin } = require('../middleware/authMiddleware');
 
-const router = Router();
+const router = express.Router();
 
 // Rutas públicas
-router.get('/', controller.getAllProducts); // Productos con paginación, filtros y ordenamiento
-router.get('/:pid', controller.getProductById); // Obtener un producto por ID
+router.get('/', controller.getAllProducts);
+router.get('/:pid', controller.getProductById);
 
-// Rutas protegidas (sólo para admin)
-router.post('/', authMiddleware('admin'), controller.createProduct);
-router.put('/:pid', authMiddleware('admin'), controller.updateProduct);
-router.delete('/:pid', authMiddleware('admin'), controller.deleteProduct);
+// Rutas protegidas (autenticado + admin)
+router.post('/', authenticate, authorizeAdmin, controller.createProduct);
+router.put('/:pid', authenticate, authorizeAdmin, controller.updateProduct);
+router.delete('/:pid', authenticate, authorizeAdmin, controller.deleteProduct);
 
-export default router;
+module.exports = router;
