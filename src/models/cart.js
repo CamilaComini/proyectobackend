@@ -1,5 +1,4 @@
-// src/models/cart.js
-const mongoose = require('../config/database'); // Importamos mongoose desde la conexión centralizada
+const mongoose = require('../config/database.js');
 
 // Definición del esquema del carrito
 const cartSchema = new mongoose.Schema({

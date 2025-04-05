@@ -1,22 +1,28 @@
-import mongoose from 'mongoose';
+const mongoose = require('../config/database.js'); // Usar conexión centralizada
+const { v4: uuidv4 } = require('uuid');
 
+// Esquema del ticket
 const ticketSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+  code: {
+    type: String,
+    unique: true,
+    default: uuidv4
   },
-  cartId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Cart',
-    required: true
+  purchase_datetime: {
+    type: Date,
+    default: Date.now
   },
   amount: {
     type: Number,
     required: true
   },
-  date: {
-    type: Date,
-    default: Date.now
+  purchaser: {
+    type: String,
+    required: true
   }
 });
+
+// Verifica si el modelo ya existe para evitar sobreescritura
+const Ticket = mongoose.models.Ticket || mongoose.model('Ticket', ticketSchema);
+
+module.exports = Ticket;

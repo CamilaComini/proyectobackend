@@ -46,7 +46,7 @@ passport.use(
   new jwtStrategy(
     {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'your_jwt_secret', // Asegúrate de cambiar esta clave secreta a algo seguro
+      secretOrKey: 'adur rnat fqsq nnki', 
     },
     async (jwtPayload, done) => {
       try {
@@ -68,7 +68,7 @@ passport.use(
   new jwtStrategy(
     {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'your_jwt_secret', // Asegúrate de cambiar esta clave secreta
+      secretOrKey: 'adur rnat fqsq nnki', 
     },
     async (jwtPayload, done) => {
       try {

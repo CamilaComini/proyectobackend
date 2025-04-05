@@ -1,57 +1,69 @@
 import TicketRepository from '../repositories/ticketRepository.js';
 import CartRepository from '../repositories/cartRepository.js';
 import ProductRepository from '../repositories/productRepository.js';
-import TicketDTO from '../dto/TicketDTO.js';
-import { v4 as uuidv4 } from 'uuid'; // para generar código único
+import { v4 as uuidv4 } from 'uuid';
+import { sendPurchaseEmail } from '../utils/mailer.js';
 
 const ticketRepository = new TicketRepository();
 const cartRepository = new CartRepository();
 const productRepository = new ProductRepository();
 
-export const createTicket = async (cartId, userId, userEmail) => {
+export const createTicket = async (cartId, user) => {
   const cart = await cartRepository.getById(cartId);
   if (!cart || cart.items.length === 0) throw new Error('El carrito está vacío');
 
-  let totalAmount = 0;
-  const productsProcessed = [];
-  const productsOutOfStock = [];
+  const productosProcesables = [];
+  const productosNoProcesados = [];
 
+  // 1. Verificar stock producto por producto
   for (const item of cart.items) {
-    const product = await productRepository.getById(item.product._id);
+    const product = await productRepository.getById(item.productId);
+    if (!product) continue;
 
     if (product.stock >= item.quantity) {
-      // Descontar stock
-      product.stock -= item.quantity;
-      await productRepository.update(product._id, product);
-
-      totalAmount += product.price * item.quantity;
-      productsProcessed.push({
-        product: product._id,
+      // restar stock
+      await productRepository.update(product._id, {
+        stock: product.stock - item.quantity,
+      });
+      productosProcesables.push({
+        productId: item.productId,
         quantity: item.quantity,
+        price: product.price,
       });
     } else {
-      productsOutOfStock.push(item);
+      productosNoProcesados.push(item);
     }
   }
 
-  if (productsProcessed.length === 0) {
-    throw new Error('No hay stock suficiente para ningún producto del carrito');
+  if (productosProcesables.length === 0) {
+    throw new Error('No hay productos con stock suficiente para procesar');
   }
 
-  const code = uuidv4();
-  const ticketDTO = new TicketDTO({
-    code,
-    amount: totalAmount,
-    purchaser: userEmail,
-    products: productsProcessed,
-    createdAt: new Date()
-  });
+  // 2. Calcular total de compra
+  const total = productosProcesables.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
-  const ticket = await ticketRepository.create(ticketDTO);
-  await cartRepository.clear(cartId); // Limpiar carrito
+  // 3. Crear ticket
+  const ticketData = {
+    code: uuidv4(),
+    amount: total,
+    purchaser: user.email,
+    purchase_datetime: new Date(),
+    cartId,
+  };
+  const ticket = await ticketRepository.create(ticketData);
 
+  // 4. Dejar en el carrito solo los productos NO procesados
+  await cartRepository.update(cartId, { items: productosNoProcesados });
+
+  // Enviar mail al comprador
+  await sendPurchaseEmail(user.email, ticket);
+
+  // 5. Devolver el ticket y los no procesados
   return {
     ticket,
-    outOfStock: productsOutOfStock
+    noProcesados: productosNoProcesados.map((p) => p.productId),
   };
 };

@@ -1,4 +1,4 @@
-const mongoose = require('../config/database'); // Importamos mongoose desde la conexión centralizada
+const mongoose = require('../config/database.js'); // Importamos mongoose desde la conexión centralizada
 
 // Definición del esquema del producto
 const productSchema = new mongoose.Schema({

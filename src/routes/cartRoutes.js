@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Cart = require('../models/Cart'); // Importamos el modelo Cart
-const Product = require('../models/product'); // Importamos el modelo Product
+const Cart = require('../models/cart.js'); // Importamos el modelo Cart
+const Product = require('../models/product.js'); // Importamos el modelo Product
 
 // Obtener todos los carritos con los productos completos
 router.get('/', async (req, res) => {
@@ -90,7 +90,7 @@ router.put('/:cid', async (req, res) => {
 // Actualizar la cantidad de un producto en el carrito con verificación de stock
 router.put('/:cid/products/:pid', async (req, res) => {
     const { cid, pid } = req.params;
-    const { quantity } = req.body; // Esperamos que el cuerpo contenga la nueva cantidad
+    const { quantity } = req.body; 
     try {
         const cart = await Cart.findById(cid); // Buscamos el carrito
         if (!cart) {

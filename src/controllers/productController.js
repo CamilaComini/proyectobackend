@@ -1,6 +1,6 @@
 import Joi from 'joi';
-import * as productService from '../services/product.service.js';
-import ProductDTO from '../dto/product.dto.js';
+import * as productService from '../services/productService.js';
+import ProductDTO from '../dto/ProductDTO.js';
 
 // Validación con Joi
 const productSchema = Joi.object({
