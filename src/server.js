@@ -14,6 +14,7 @@ const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
 const Product = require('./models/product'); // Modelo para WebSocket
+require('dotenv').config();
 
 // Inicialización
 const app = express();
