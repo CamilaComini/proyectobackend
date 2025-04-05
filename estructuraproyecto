@@ -1,23 +1,63 @@
 /mi-proyecto
 │── /node_modules
 │── /src
-│   │── /controllers
-│   │   ├── productsController.js
+│   ├── /config
+│   │   ├── database.js               
+│   │   └── passport.js     
+│   ├── /controllers
+│   │   ├── authController.js     
+│   │   ├── productController.js  
+│   │   ├── cartController.js     
+│   │   └── ticketController.js   
+│   ├── /dao
+│   │   ├── MongoUserDao.js     
+│   │   ├── MongoProductDao.js   
+│   │   ├── MongoCartDao.js      
+│   │   └── MongoTicketDao.js    
 │   │── /data
-│   │   ├── carts.json
-│   │   ├── products.json
+│   │   ├── cart.json
+│   │   ├── product.json
+│   ├── /dto
+│   │   ├── TicketDTO.js
+│   │   ├── CartDTO.js
+│   │   ├── ProductDTO.js
+│   │   └── UserDTO.js          
+│   ├── /middlewares
+│   │   ├── authMiddleware.js   
+│   │   ├── jwtMiddleware.js    
+│   │   └── errorMiddleware.js    
 │   │── /models
-│   │   ├── carts.js
-│   │   ├── products.js
+│   │   ├── cart.js
+│   │   ├── product.js
+│   │   ├── user.js        
+│   │   └── ticket.js     
+│   ├── /repositories
+│   │   ├── userRepository.js   
+│   │   ├── productRepository.js
+│   │   ├── cartRepository.js
+│   │   └── ticketRepository.js
 │   │── /routes
-│   │   ├── carts.router.js
-│   │   ├── products.router.js
-│   │── /views  
+│   │   ├── cartRouter.js
+│   │   ├── authRoutes.js      
+│   │   ├── productRoutes.js  
+│   │   ├── sessionRoutes.js 
+│   │   └── ticketRoutes.js     
+│   ├── /services
+│   │   ├── authService.js     
+│   │   ├── productService.js   
+│   │   ├── cartService.js      
+│   │   └── ticketService.js    
+│   │── /utils 
+│   │   │── hash.js
+│   │   │── jwt.js    
+│   └── /views  
 │   │   │── /layouts
 │   │   │    │── main.handlebars
 │   │   │── index.handlebars
-│   │   │── realTimeProducts.handlebars
+│   │   │── realTimeProducts.handlebars    
 │   │── server.js
+│   │── app.js
+│── .env
 │── estructuraproyecto
 │── package-lock.json
 │── package.json
