@@ -1,7 +1,7 @@
 const UserRepository = require('../repositories/userRepository');
 const { hashPassword, comparePassword } = require('../utils/hash');
 const { generateToken } = require('../utils/jwt');
-const UserDTO = require('../dto/UserDTO');
+const UserDTO = require('../dto/UserDTO.js');
 
 const userRepository = new UserRepository();
 

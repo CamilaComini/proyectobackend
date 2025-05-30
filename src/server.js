@@ -6,7 +6,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const { engine } = require('express-handlebars');
 const passport = require('./config/passport');
-const mongoose = require('./config/database');
+const { connectDB } = require('./config/database');
 const errorMiddleware = require('./middleware/errorMiddleware');
 const jwt = require('./utils/jwt');
 const authRoutes = require('./routes/authRoutes');
@@ -83,6 +83,11 @@ io.on('connection', async (socket) => {
 
 // Arrancar el servidor
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Servidor escuchando en http://localhost:${PORT}`);
+
+connectDB().then(() => {
+  server.listen(PORT, () => {
+    console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
+  });
+}).catch((err) => {
+  console.error('❌ Error al conectar a MongoDB:', err);
 });

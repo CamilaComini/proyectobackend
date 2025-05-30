@@ -1,4 +1,4 @@
-const mongoose = require('../config/database.js'); // solo para conectarte
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 // Crear el esquema del usuario
@@ -30,7 +30,13 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
+    enum: ['user', 'admin'],
     default: 'user',
+  },
+  pets: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Pet',
+    default: [], 
   },
 });
 

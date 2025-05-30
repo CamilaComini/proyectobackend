@@ -47,6 +47,7 @@
 │   │   ├── cartService.js      
 │   │   └── ticketService.js    
 │   │── /utils 
+│   │   │── mockgenerator.js
 │   │   │── hash.js
 │   │   │── jwt.js    
 │   └── /views  

@@ -1,4 +1,4 @@
-const mongoose = require('../config/database.js');
+const mongoose = require('mongoose');
 
 // Definición del esquema del carrito
 const cartSchema = new mongoose.Schema({

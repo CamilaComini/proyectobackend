@@ -1,4 +1,4 @@
-const mongoose = require('../config/database.js'); // Usar conexión centralizada
+const mongoose = require('mongoose'); 
 const { v4: uuidv4 } = require('uuid');
 
 // Esquema del ticket

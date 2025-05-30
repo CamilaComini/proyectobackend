@@ -1,4 +1,4 @@
-const mongoose = require('../config/database.js'); // solo para conectarte
+const mongoose = require('mongoose'); 
 
 // Definición del esquema del producto
 const productSchema = new mongoose.Schema({
